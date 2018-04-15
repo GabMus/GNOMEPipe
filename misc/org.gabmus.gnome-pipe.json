@@ -1,0 +1,30 @@
+{
+    "app-id": "org.gabmus.gnome-pipe",
+    "command": "gnome-pipe",
+    "runtime": "org.gnome.Platform",
+    "runtime-version": "3.26",
+    "sdk": "org.gnome.Sdk",
+    "finish-args": [
+        "--share=ipc",
+        "--socket=x11",
+        "--socket=wayland",
+        "--talk-name=org.gnome.SettingsDaemon",
+        "--filesystem=home:ro",
+        "--filesystem=xdg-run/dconf",
+        "--filesystem=~/.config/dconf:ro",
+        "--talk-name=ca.desrt.dconf",
+        "--env=DCONF_USER_CONFIG_DIR=.config/dconf"
+    ],
+    "modules": [
+        {
+            "name": "gnome-pipe",
+            "buildsystem": "meson",
+            "builddir": true,
+            "config-opts": ["--buildtype=release"],
+            "sources": [{
+                "type": "git",
+                "url": "git://github.com/gabmus/gnome-pipe"
+            }]
+        }
+    ]
+}

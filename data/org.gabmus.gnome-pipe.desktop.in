@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=GNOME-Pipe
+Comment=Wallpaper manager with multimonitor support for GNOME
+Exec=@bindir@/gnome-pipe %U
+Icon=org.gabmus.gnome-pipe
+Terminal=false
+Type=Application
+StartupNotify=true
+MimeType=
+Categories=Utility;GTK;GNOME;
+Keywords=youtube;video;yt

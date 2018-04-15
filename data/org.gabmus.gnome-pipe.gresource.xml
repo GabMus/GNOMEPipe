@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+  <gresource prefix="/org/gabmus/gnome-pipe">
+    <file compressed="true">org.gabmus.gnome-pipe.service.desktop</file>
+
+    <!-- <file preprocess="xml-stripblanks">gtk/menus.ui</file> -->
+    <!--file preprocess="xml-stripblanks">gtk/help-overlay.ui</file-->
+
+    <file preprocess="xml-stripblanks">ui/ui.glade</file>
+
+    <file preprocess="xml-stripblanks">icons/org.gabmus.gnome-pipe.svg</file>
+    <file preprocess="xml-stripblanks">icons/org.gabmus.gnome-pipe-symbolic.svg</file>
+
+  </gresource>
+</gresources>

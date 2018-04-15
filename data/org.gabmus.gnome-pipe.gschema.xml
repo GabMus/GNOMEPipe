@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema path="/org/gabmus/gnome-pipe/" id="org.gabmus.gnome-pipe" gettext-domain="gnome-pipe">
+
+    <!-- <key type="s" name="username">
+      <default>""</default>
+      <summary>Email address</summary>
+  </key> -->
+
+  </schema>
+
+</schemalist>
