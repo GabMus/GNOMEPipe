@@ -1,11 +1,11 @@
-%global appid org.gabmus.gnome-pipe
+%global appid org.gabmus.gnomepipe
 
-Name:    gnome-pipe
+Name:    gnomepipe
 Version: 1.2.0
 Release: 1%{dist}
 Summary: Wallpaper manager with multimonitor support for GNOME
 License: GPLv3+
-URL:     https://github.com/GabMus/gnome-pipe
+URL:     https://github.com/GabMus/gnomepipe
 Source0: %{name}-%{version}.tar.gz
 
 BuildArch: noarch
@@ -20,7 +20,7 @@ Requires: gtk3 >= 3.14
 
 %description
 Wallpaper manager with multimonitor support for GNOME
-GNOME-Pipe lets you set different wallpapers for each of your monitors in the
+GNOMEPipe lets you set different wallpapers for each of your monitors in the
 GNOME desktop. It uses Imagemagick to create a single image merging all of your
 chosen wallpapers and setting it as your wallpaper with the "Spanned" option.
 
@@ -54,10 +54,10 @@ fi
 %files
 %license COPYING
 %doc README.md
-%{_bindir}/gnome-pipe
-%dir %{python3_sitelib}/gnome-pipe
-%{python3_sitelib}/gnome-pipe/
-%{_datadir}/gnome-pipe/%{appid}.gresource
+%{_bindir}/gnomepipe
+%dir %{python3_sitelib}/gnomepipe
+%{python3_sitelib}/gnomepipe/
+%{_datadir}/gnomepipe/%{appid}.gresource
 %{_datadir}/applications/%{appid}.desktop
 %{_datadir}/dbus-1/services/%{appid}.service
 %{_datadir}/appdata/%{appid}.appdata.xml

@@ -22,4 +22,4 @@ if not destdir:
 
 print('Compiling python bytecode...')
 moduledir = sysconfig.get_path('purelib', vars={'base': str(prefix)})
-compileall.compile_dir(destdir + os.path.join(moduledir, 'gnome-pipe'), optimize=2)
+compileall.compile_dir(destdir + os.path.join(moduledir, 'gnomepipe'), optimize=2)

@@ -25,33 +25,36 @@ from gi.repository import Gtk, Gdk, Gio, GdkPixbuf
 
 from . import threading_helper as ThreadingHelper
 from . import listbox_helper as ListboxHelper
-
-import hashlib # for pseudo-random wallpaper name generation
+from . import videofeed_flowbox_item as VideofeedFlowboxItem
+from . import channel
 
 
 HOME = os.environ.get('HOME')
-G_CONFIG_FILE_PATH = '{0}/.config/gnome-pipe.json'.format(HOME)
+G_CONFIG_FILE_PATH = '{0}/.config/gnomepipe.json'.format(HOME)
+G_CACHE_PATH = '{0}/.cache/gnomepipe/'.format(HOME)
 
 # check if inside flatpak sandbox. if so change some variables
 if 'XDG_RUNTIME_DIR' in os.environ.keys():
     if os.path.isfile('{0}/flatpak-info'.format(os.environ['XDG_RUNTIME_DIR'])):
-        G_CONFIG_FILE_PATH = '{0}/gnome-pipe.json'.format(os.environ.get('XDG_CONFIG_HOME'))
+        G_CONFIG_FILE_PATH = '{0}/gnomepipe.json'.format(os.environ.get('XDG_CONFIG_HOME'))
+        G_CACHE_PATH = '{0}/gnomepipe/'.format(os.environ.get('XDG_CACHE_HOME'))
 
 class Application(Gtk.Application):
     def __init__(self, **kwargs):
         self.builder = Gtk.Builder.new_from_resource(
-            '/org/gabmus/gnome-pipe/ui/ui.glade'
+            '/org/gabmus/gnomepipe/ui/ui.glade'
         )
         super().__init__(
-            application_id='org.gabmus.gnome-pipe',
+            application_id='org.gabmus.gnomepipe',
             flags=Gio.ApplicationFlags.HANDLES_COMMAND_LINE,
             **kwargs
         )
-        self.RESOURCE_PATH = '/org/gabmus/gnome-pipe/'
+        self.RESOURCE_PATH = '/org/gabmus/gnomepipe/'
 
         self.CONFIG_FILE_PATH = G_CONFIG_FILE_PATH  # G stands for Global (variable)
 
         self.configuration = self.get_config_file()
+        self.channels = []
 
         self.builder.connect_signals(self)
 
@@ -60,7 +63,7 @@ class Application(Gtk.Application):
 
         self.window = self.builder.get_object('window')
 
-        self.window.set_icon_name('org.gabmus.gnome-pipe')
+        self.window.set_icon_name('org.gabmus.gnomepipe')
 
         self.window.resize(
             self.configuration['windowsize']['width'],
@@ -69,10 +72,17 @@ class Application(Gtk.Application):
 
         self.mainBox = self.builder.get_object('mainBox')
 
+        self.feed_videos_flowbox = self.builder.get_object('feedVideosFlowbox')
+
         self.errorDialog = Gtk.MessageDialog()
         self.errorDialog.add_button('Ok', 0)
         self.errorDialog.set_default_response(0)
         self.errorDialog.set_transient_for(self.window)
+
+        # After components init, do the following
+
+        self.refresh_channels(self.configuration['subscriptions'])
+        self.refresh_feed_ui()
 
     def on_window_size_allocate(self, *args):
         alloc = self.window.get_allocation()
@@ -96,17 +106,27 @@ class Application(Gtk.Application):
                     'width': 600,
                     'height': 400
                 },
+                'subscriptions': [
+                    'UCVqlDOUyIjMWqBUhp73a90g'
+                ]
             }
             self.save_config_file(n_config)
             return n_config
         else:
             do_save = False
             with open(self.CONFIG_FILE_PATH, 'r') as fd:
+                config = json.loads(fd.read())
+                fd.close()
                 if not 'windowsize' in config.keys():
                     config['windowsize'] = {
                         'width': 600,
                         'height': 400
                     }
+                    do_save = True
+                if not 'subscriptions' in config.keys():
+                    config['subscriptions'] = [
+                        'UCVqlDOUyIjMWqBUhp73a90g'
+                    ]
                     do_save = True
                 if do_save:
                     self.save_config_file(config)
@@ -114,7 +134,7 @@ class Application(Gtk.Application):
 
     def do_activate(self):
         self.add_window(self.window)
-        self.window.set_wmclass('GNOME-Pipe', 'GNOME-Pipe')
+        self.window.set_wmclass('GNOMEPipe', 'GNOMEPipe')
 
         appMenu = Gio.Menu()
         appMenu.append("About", "app.about")
@@ -177,6 +197,26 @@ class Application(Gtk.Application):
 
     def on_aboutdialog_close(self, *args):
         self.builder.get_object("aboutdialog").hide()
+
+    def refresh_channels(self, subscriptions):
+        for sub in subscriptions:
+            if not sub in [c.channelid for c in self.channels]:
+                self.channels.append(channel.Channel.from_channelid(sub))
+        for index, channel in enumerate(self.channels):
+            if not channel.channelid in subscriptions:
+                self.channels.pop(index)
+            else:
+                channel.fetch_videos()
+
+    def refresh_feed_ui(self):
+        # TODO: reimplement mixing all channels together with datetime ordering
+        for channel in self.channels:
+            if not channel.videos is None:
+                for video in channel.videos:
+                    vffi = VideofeedFlowboxItem.VideofeedBox(video)
+                    self.feed_videos_flowbox.add(vffi)
+                    vffi.set_video_thumb()
+                    self.feed_videos_flowbox.show_all()
 
     # Handler functions START
 

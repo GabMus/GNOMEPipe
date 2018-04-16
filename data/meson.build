@@ -1,5 +1,5 @@
 gnome = import('gnome')
-app_id = 'org.gabmus.gnome-pipe'
+app_id = 'org.gabmus.gnomepipe'
 
 desktop_conf = configuration_data()
 desktop_conf.set('bindir', join_paths(prefix, get_option('bindir')))
@@ -60,22 +60,22 @@ if false
   icon_targets = []
   foreach size: sizes
     icon_targets += custom_target('symbolic-icon-' + size,
-      input: 'icons/org.gabmus.gnome-pipe-symbolic.svg',
-      output: 'org.gabmus.gnome-pipe-symbolic.png',
+      input: 'icons/org.gabmus.gnomepipe-symbolic.svg',
+      output: 'org.gabmus.gnomepipe-symbolic.png',
       command: [gtk_encode_symbolic, '--output=' + meson.current_build_dir(), '@INPUT@', size]
     )
   endforeach
 endif
 
 icondir = join_paths(get_option('datadir'), 'icons/hicolor')
-install_data('icons/org.gabmus.gnome-pipe.svg',
+install_data('icons/org.gabmus.gnomepipe.svg',
   install_dir: join_paths(icondir, 'scalable/apps')
 )
-install_data('icons/org.gabmus.gnome-pipe-symbolic.svg',
+install_data('icons/org.gabmus.gnomepipe-symbolic.svg',
   install_dir: join_paths(icondir, 'symbolic/apps')
 )
 
-gnome-pipe_resources = gnome.compile_resources(app_id,
+gnomepipe_resources = gnome.compile_resources(app_id,
   app_id + '.gresource.xml',
   gresource_bundle: true,
   # dependencies: desktop_service,
@@ -83,7 +83,7 @@ gnome-pipe_resources = gnome.compile_resources(app_id,
   install_dir: pkgdatadir
 )
 
-gnome-pipe_settings = gnome.compile_schemas()
+gnomepipe_settings = gnome.compile_schemas()
 
 install_data(
   app_id + '.appdata.xml',

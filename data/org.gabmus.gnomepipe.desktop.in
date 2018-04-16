@@ -1,8 +1,8 @@
 [Desktop Entry]
-Name=GNOME-Pipe
+Name=GNOMEPipe
 Comment=Wallpaper manager with multimonitor support for GNOME
-Exec=@bindir@/gnome-pipe %U
-Icon=org.gabmus.gnome-pipe
+Exec=@bindir@/gnomepipe %U
+Icon=org.gabmus.gnomepipe
 Terminal=false
 Type=Application
 StartupNotify=true

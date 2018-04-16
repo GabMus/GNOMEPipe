@@ -1,6 +1,6 @@
 {
-    "app-id": "org.gabmus.gnome-pipe",
-    "command": "gnome-pipe",
+    "app-id": "org.gabmus.gnomepipe",
+    "command": "gnomepipe",
     "runtime": "org.gnome.Platform",
     "runtime-version": "3.26",
     "sdk": "org.gnome.Sdk",
@@ -17,14 +17,13 @@
     ],
     "modules": [
         {
-            "name": "gnome-pipe",
+            "name": "gnomepipe",
             "buildsystem": "meson",
             "builddir": true,
             "config-opts": ["--buildtype=release"],
             "sources": [{
-                "type": "archive",
-                "url": "https://github.com/GabMus/gnome-pipe/archive/0.1.tar.gz",
-                "sha256": "81947df9452e02e7d7bfe04494cd34db3589f930c70dffa9c099698f81f240da"
+                "type": "git",
+                "url": "git://github.com/gabmus/gnomepipe"
             }]
         }
     ]

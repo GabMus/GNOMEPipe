@@ -1,2 +1,2 @@
 version=3
-https://github.com/GabMus/gnome-pipe/releases .*/(.*)\.tar\.gz
+https://github.com/GabMus/gnomepipe/releases .*/(.*)\.tar\.gz

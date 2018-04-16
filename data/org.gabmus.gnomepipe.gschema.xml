@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist>
-  <schema path="/org/gabmus/gnome-pipe/" id="org.gabmus.gnome-pipe" gettext-domain="gnome-pipe">
+  <schema path="/org/gabmus/gnomepipe/" id="org.gabmus.gnomepipe" gettext-domain="gnomepipe">
 
     <!-- <key type="s" name="username">
       <default>""</default>

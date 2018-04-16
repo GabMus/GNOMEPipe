@@ -1,8 +1,8 @@
-Source: gnome-pipe
+Source: gnomepipe
 Section: gnome
 Priority: optional
 Maintainer: Gabriele Musco <emaildigabry@gmail.com>
-Homepage: https://github.com/GabMus/gnome-pipe
+Homepage: https://github.com/GabMus/gnomepipe
 Standards-Version: 4.1.0
 X-Python3-Version: >= 3.4
 Build-Depends:
@@ -23,4 +23,4 @@ Recommends:
  ${misc:Depends},
  ${python3:Depends}
 Description: Simple YouTube client for GNOME
- gnome-pipe is a simple YouTube client
+ gnomepipe is a simple YouTube client

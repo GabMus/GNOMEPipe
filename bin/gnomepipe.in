@@ -1,6 +1,6 @@
 #!@PYTHON@
 
-# gnome-pipe
+# gnomepipe
 #
 # Copyright (C) 2016 Gabriele Musco <emaildigabry@gmail.com>
 #
@@ -47,8 +47,8 @@ if __name__ == '__main__':
 
 
     from gi.repository import Gio
-    resource = Gio.Resource.load(os.path.join(pkgdatadir, 'org.gabmus.gnome-pipe.gresource'))
+    resource = Gio.Resource.load(os.path.join(pkgdatadir, 'org.gabmus.gnomepipe.gresource'))
     resource._register()
 
-    from gnome-pipe import __main__
+    from gnomepipe import __main__
     __main__.main()

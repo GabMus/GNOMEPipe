@@ -1,3 +1,0 @@
-[D-BUS Service]
-Name=org.gabmus.gnome-pipe
-Exec=@bindir@/gnome-pipe --gapplication-service

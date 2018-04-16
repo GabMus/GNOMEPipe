@@ -6,14 +6,14 @@ conf.set('PYTHON', python3.find_python().path())
 conf.set('pythondir', join_paths(prefix, pythondir))
 
 configure_file(
-  input: 'gnome-pipe.in',
-  output: 'gnome-pipe',
+  input: 'gnomepipe.in',
+  output: 'gnomepipe',
   configuration: conf,
   install: true,
   install_dir: get_option('bindir')
 )
 
-gnome-pipe = join_paths(meson.build_root(), 'bin', 'gnome-pipe')
+gnomepipe = join_paths(meson.build_root(), 'bin', 'gnomepipe')
 run_target('run',
-  command: [gnome-pipe]
+  command: ['gnomepipe']
 )
