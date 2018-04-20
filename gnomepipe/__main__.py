@@ -72,11 +72,14 @@ class Application(Gtk.Application):
 
         self.feed_videos_flowbox = self.builder.get_object('feedVideosFlowbox')
         self.spinner_or_content_stack = self.builder.get_object('spinnerOrContentStack')
+        self.refresh_button = self.builder.get_object('refreshButton')
 
         self.errorDialog = Gtk.MessageDialog()
         self.errorDialog.add_button('Ok', 0)
         self.errorDialog.set_default_response(0)
         self.errorDialog.set_transient_for(self.window)
+
+        self.mpv_process = None
 
     def on_window_size_allocate(self, *args):
         alloc = self.window.get_allocation()
@@ -213,15 +216,25 @@ class Application(Gtk.Application):
         else:
             self.spinner_or_content_stack.set_visible_child_name('main')
 
+    def empty_flowbox(self, flowbox):
+        while True:
+            child = flowbox.get_child_at_index(0)
+            if child:
+                flowbox.remove(child)
+            else:
+                break
+
     def refresh_feed_ui(self):
-        # TODO: reimplement mixing all channels together with datetime ordering
+        self.refresh_button.set_sensitive(False)
         self.spinner_set_state(True)
+        self.empty_flowbox(self.feed_videos_flowbox)
         refresh_thread = ThreadingHelper.do_async(
             self.refresh_channels,
             (self.configuration['subscriptions'],)
         )
         ThreadingHelper.wait_for_thread(refresh_thread)
         self.spinner_set_state(False)
+        # TODO: reimplement mixing all channels together with datetime ordering
         vffilist=[]
         for channel in self.channels:
             if not channel.videos is None:
@@ -233,8 +246,20 @@ class Application(Gtk.Application):
                     self.feed_videos_flowbox.show_all()
         for vffi in vffilist:
             vffi.set_video_thumb()
+        self.refresh_button.set_sensitive(True)
 
     # Handler functions START
+
+    def on_feedVideosFlowbox_child_activated(self, flowbox, child):
+        if not self.mpv_process is None:
+            if self.mpv_process.poll() is None: # Process is still running
+                print('Another process is still running')
+                return
+        child.stop_video()
+        self.mpv_process = child.play_video()
+
+    def on_refreshButton_clicked(self, btn):
+        self.refresh_feed_ui()
 
     def on_wallpapersFlowbox_child_activated(self, flowbox, selected_item):
         self.set_monitor_wallpaper_preview(

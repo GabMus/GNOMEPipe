@@ -51,3 +51,9 @@ class VideofeedBox(Gtk.FlowBoxChild):
         if type(return_pixbuf_pointer) == list:
             return_pixbuf_pointer.append(thumb_pixbuf)
         return thumb_pixbuf
+
+    def play_video(self):
+        return self.video.play()
+
+    def stop_video(self):
+        self.video.stop()
