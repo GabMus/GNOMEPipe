@@ -1,3 +1,3 @@
 # GNOMEPipe
 
-Simple Gtk+3 app for browsing YouTube
+Gtk+3 app for browsing YouTube and playing via mpv
