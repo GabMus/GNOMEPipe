@@ -16,10 +16,13 @@ class VideofeedBox(Gtk.FlowBoxChild):
 
         self.container_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.video_thumb = Gtk.Image.new_from_icon_name('image-x-generic', Gtk.IconSize.DIALOG)
-        self.container_box.add(self.wp_image)
+        self.container_box.add(self.video_thumb)
 
         self.titlelabel = Gtk.Label()
         self.titlelabel.set_text(self.video.title)
+        self.titlelabel.set_line_wrap(True)
+        self.titlelabel.set_size_request(100, -1)
+        self.titlelabel.set_max_width_chars(30)
 
         self.container_box.add(self.titlelabel)
 
@@ -27,6 +30,7 @@ class VideofeedBox(Gtk.FlowBoxChild):
         self.container_box.set_margin_right(12)
 
         self.add(self.container_box)
+        self.set_size_request(250, -1)
 
     def set_video_thumb(self):
         pixbuf_fake_list=[]
@@ -46,4 +50,4 @@ class VideofeedBox(Gtk.FlowBoxChild):
         thumb_pixbuf = GdkPixbuf.Pixbuf.new_from_stream_at_scale(input_stream, 250, 250, True)
         if type(return_pixbuf_pointer) == list:
             return_pixbuf_pointer.append(thumb_pixbuf)
-        return wp_pixbuf
+        return thumb_pixbuf

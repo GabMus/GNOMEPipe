@@ -3,20 +3,20 @@
 
 Copyright (C) 
 
-This file is part of GNOME-Pipe.
+This file is part of GNOMEPipe.
 
-GNOME-Pipe is free software: you can redistribute it and/or modify
+GNOMEPipe is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-GNOME-Pipe is distributed in the hope that it will be useful,
+GNOMEPipe is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with GNOME-Pipe.  If not, see <http://www.gnu.org/licenses/>.
+along with GNOMEPipe.  If not, see <http://www.gnu.org/licenses/>.
 
 Author: Gabriele Musco
 
@@ -24,7 +24,7 @@ Author: Gabriele Musco
 <interface>
   <requires lib="gtk+" version="3.20"/>
   <!-- interface-license-type gplv3 -->
-  <!-- interface-name GNOME-Pipe -->
+  <!-- interface-name GNOMEPipe -->
   <!-- interface-description Wallpaper manager with multimonitor support for GNOME -->
   <!-- interface-authors Gabriele Musco -->
   <object class="GtkFileFilter" id="filefilterFolders">
@@ -56,7 +56,6 @@ Author: Gabriele Musco
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="halign">center</property>
-            <property name="stack">mainStack</property>
           </object>
         </child>
         <child>
@@ -75,6 +74,7 @@ Author: Gabriele Musco
           </object>
           <packing>
             <property name="pack_type">end</property>
+            <property name="position">2</property>
           </packing>
         </child>
         <child>
@@ -99,56 +99,94 @@ Author: Gabriele Musco
       </object>
     </child>
     <child>
-      <object class="GtkStack" id="mainStack">
+      <object class="GtkStack" id="spinnerOrContentStack">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
-        <property name="transition_type">slide-left-right</property>
+        <property name="transition_type">crossfade</property>
         <child>
-          <object class="GtkBox" id="mainStackFeedBox">
+          <object class="GtkStack" id="mainStack">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="orientation">vertical</property>
+            <property name="transition_type">slide-left-right</property>
             <child>
-              <object class="GtkFlowBox" id="feedVideosFlowbox">
+              <object class="GtkBox" id="mainStackFeedBox">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="orientation">vertical</property>
+                <child>
+                  <object class="GtkScrolledWindow" id="feedScrolledWindow">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="hscrollbar_policy">never</property>
+                    <property name="shadow_type">in</property>
+                    <child>
+                      <object class="GtkViewport" id="feedViewport">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <child>
+                          <object class="GtkFlowBox" id="feedVideosFlowbox">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="min_children_per_line">1</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <placeholder/>
+                </child>
+                <child>
+                  <placeholder/>
+                </child>
               </object>
               <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">0</property>
+                <property name="name">Feed</property>
+                <property name="title" translatable="yes">Feed</property>
               </packing>
             </child>
             <child>
-              <placeholder/>
-            </child>
-            <child>
-              <placeholder/>
+              <object class="GtkBox" id="mainStackChannelsBox">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="orientation">vertical</property>
+                <child>
+                  <placeholder/>
+                </child>
+                <child>
+                  <placeholder/>
+                </child>
+                <child>
+                  <placeholder/>
+                </child>
+              </object>
+              <packing>
+                <property name="name">Channels</property>
+                <property name="title" translatable="yes">Channels</property>
+                <property name="position">1</property>
+              </packing>
             </child>
           </object>
           <packing>
-            <property name="name">Feed</property>
-            <property name="title" translatable="yes">Feed</property>
+            <property name="name">main</property>
+            <property name="title" translatable="yes">main</property>
           </packing>
         </child>
         <child>
-          <object class="GtkBox" id="mainStackChannelsBox">
+          <object class="GtkSpinner" id="uiRefreshSpinner">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="orientation">vertical</property>
-            <child>
-              <placeholder/>
-            </child>
-            <child>
-              <placeholder/>
-            </child>
-            <child>
-              <placeholder/>
-            </child>
+            <property name="active">True</property>
           </object>
           <packing>
-            <property name="name">Channels</property>
-            <property name="title" translatable="yes">Channels</property>
+            <property name="name">spinner</property>
+            <property name="title" translatable="yes">spinner</property>
             <property name="position">1</property>
           </packing>
         </child>
@@ -160,11 +198,11 @@ Author: Gabriele Musco
     <property name="modal">True</property>
     <property name="type_hint">dialog</property>
     <property name="transient_for">window</property>
-    <property name="program_name">GNOME-Pipe</property>
+    <property name="program_name">GNOMEPipe</property>
     <property name="version">0.1</property>
-    <property name="website">https://github.com/gabmus/gnome-pipe</property>
+    <property name="website">https://github.com/gabmus/gnomepipe</property>
     <property name="authors">Gabriele Musco (GabMus)</property>
-    <property name="logo_icon_name">org.gabmus.gnome-pipe</property>
+    <property name="logo_icon_name">org.gabmus.gnomepipe</property>
     <property name="license_type">gpl-3-0</property>
     <signal name="close" handler="on_aboutdialog_close" swapped="no"/>
     <child type="titlebar">

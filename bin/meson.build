@@ -15,5 +15,5 @@ configure_file(
 
 gnomepipe = join_paths(meson.build_root(), 'bin', 'gnomepipe')
 run_target('run',
-  command: ['gnomepipe']
+  command: [gnomepipe]
 )

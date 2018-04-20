@@ -26,7 +26,7 @@ from gi.repository import Gtk, Gdk, Gio, GdkPixbuf
 from . import threading_helper as ThreadingHelper
 from . import listbox_helper as ListboxHelper
 from . import videofeed_flowbox_item as VideofeedFlowboxItem
-from . import channel
+from . import pipe_channel
 
 
 HOME = os.environ.get('HOME')
@@ -70,19 +70,13 @@ class Application(Gtk.Application):
             self.configuration['windowsize']['height']
         )
 
-        self.mainBox = self.builder.get_object('mainBox')
-
         self.feed_videos_flowbox = self.builder.get_object('feedVideosFlowbox')
+        self.spinner_or_content_stack = self.builder.get_object('spinnerOrContentStack')
 
         self.errorDialog = Gtk.MessageDialog()
         self.errorDialog.add_button('Ok', 0)
         self.errorDialog.set_default_response(0)
         self.errorDialog.set_transient_for(self.window)
-
-        # After components init, do the following
-
-        self.refresh_channels(self.configuration['subscriptions'])
-        self.refresh_feed_ui()
 
     def on_window_size_allocate(self, *args):
         alloc = self.window.get_allocation()
@@ -164,6 +158,9 @@ class Application(Gtk.Application):
 
         self.window.show_all()
 
+        # After components init, do the following
+        self.refresh_feed_ui()
+
     def do_command_line(self, args):
         """
         GTK.Application command line handler
@@ -198,25 +195,44 @@ class Application(Gtk.Application):
     def on_aboutdialog_close(self, *args):
         self.builder.get_object("aboutdialog").hide()
 
-    def refresh_channels(self, subscriptions):
+    def refresh_channels(self, subscriptions=None):
+        if subscriptions is None:
+            subscriptions = self.configuration['subscriptions']
         for sub in subscriptions:
             if not sub in [c.channelid for c in self.channels]:
-                self.channels.append(channel.Channel.from_channelid(sub))
+                self.channels.append(pipe_channel.Channel.from_channelid(sub))
         for index, channel in enumerate(self.channels):
             if not channel.channelid in subscriptions:
                 self.channels.pop(index)
             else:
                 channel.fetch_videos()
 
+    def spinner_set_state(self, active):
+        if active:
+            self.spinner_or_content_stack.set_visible_child_name('spinner')
+        else:
+            self.spinner_or_content_stack.set_visible_child_name('main')
+
     def refresh_feed_ui(self):
         # TODO: reimplement mixing all channels together with datetime ordering
+        self.spinner_set_state(True)
+        refresh_thread = ThreadingHelper.do_async(
+            self.refresh_channels,
+            (self.configuration['subscriptions'],)
+        )
+        ThreadingHelper.wait_for_thread(refresh_thread)
+        self.spinner_set_state(False)
+        vffilist=[]
         for channel in self.channels:
             if not channel.videos is None:
                 for video in channel.videos:
                     vffi = VideofeedFlowboxItem.VideofeedBox(video)
                     self.feed_videos_flowbox.add(vffi)
-                    vffi.set_video_thumb()
+                    vffilist.append(vffi)
+                    vffi.show_all()
                     self.feed_videos_flowbox.show_all()
+        for vffi in vffilist:
+            vffi.set_video_thumb()
 
     # Handler functions START
 

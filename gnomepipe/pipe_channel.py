@@ -1,5 +1,5 @@
 from . import youtube_api_manager as yam
-from . import video
+from . import pipe_video
 import feedparser
 import datetime
 
@@ -34,11 +34,11 @@ class Channel:
             self.videos=[]
             for entry in self.feed.entries:
                 self.videos.append(
-                    video.Video(
+                    pipe_video.Video(
                         self,
                         entry['title'],
                         entry['link'],
-                        entry['media+thumbnail'][0]['url'],
+                        entry['media_thumbnail'][0]['url'],
                         entry['summary'],
                         datetime.datetime.strptime(
                             entry['published'], ISO_DATETIME_FORMAT
