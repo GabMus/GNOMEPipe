@@ -80,6 +80,15 @@ class Application(Gtk.Application):
 
         self.channels_listbox = self.builder.get_object('channelsListbox')
 
+        self.searchbar = self.builder.get_object('searchbar')
+        self.searchbar_entry = self.builder.get_object('searchbarEntry')
+
+        # Fixing searchbar: it has multiple box children (not explicit in the
+        # xml but visible with gtk parasite), and one of them must be set to fill
+        # otherwise the searchbar entry will be very small
+        self.searchbar.get_child().get_child().get_children()[1].set_halign(Gtk.Align.FILL)
+        self.searchbar_entry.set_hexpand(True)
+
         self.errorDialog = Gtk.MessageDialog()
         self.errorDialog.add_button('Ok', 0)
         self.errorDialog.set_default_response(0)
@@ -278,6 +287,9 @@ class Application(Gtk.Application):
             clbi.set_channel_picture()
         self.refresh_button.set_sensitive(True)
 
+    def set_search_state(self, active):
+        self.searchbar.set_search_mode(active)
+
     # Handler functions START
 
     def on_feedVideosFlowbox_child_activated(self, flowbox, child):
@@ -296,6 +308,9 @@ class Application(Gtk.Application):
         self.set_monitor_wallpaper_preview(
             selected_item.get_child().wallpaper_path
         )
+
+    def on_searchToggleButton_toggled(self, button):
+        self.set_search_state(button.get_active())
 
     # Handler functions END
 
