@@ -2,10 +2,14 @@ from . import youtube_api_manager as yam
 from . import pipe_video
 import feedparser
 import datetime
+import hashlib
 
 FEED_PREFIX='https://www.youtube.com/feeds/videos.xml?channel_id='
 WEBLINK_PREFIX='https://youtube.com/channel/'
 ISO_DATETIME_FORMAT='%Y-%m-%dT%H:%M:%S+00:00'
+
+def thumb_for(videoid):
+    return 'https://img.youtube.com/vi/{0}/mqdefault.jpg'.format(videoid)
 
 class Channel:
 
@@ -29,6 +33,7 @@ class Channel:
         self.feed_url = FEED_PREFIX + channelid
         self.feed = feedparser.parse(self.feed_url)
         self.cachedir = cachedir
+        self.channelhash = hashlib.sha512(self.channelid.encode()).hexdigest()
         self.videos = None
 
     def fetch_videos(self):
@@ -40,7 +45,7 @@ class Channel:
                         self,
                         entry['title'],
                         entry['link'],
-                        entry['media_thumbnail'][0]['url'],
+                        thumb_for(entry['yt_videoid']),
                         entry['summary'],
                         datetime.datetime.strptime(
                             entry['published'], ISO_DATETIME_FORMAT

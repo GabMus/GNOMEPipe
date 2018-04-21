@@ -56,26 +56,8 @@ Author: Gabriele Musco
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="halign">center</property>
+            <property name="stack">mainStack</property>
           </object>
-        </child>
-        <child>
-          <object class="GtkButton" id="refreshButton">
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">True</property>
-            <property name="tooltip_text" translatable="yes">Refresh</property>
-            <child>
-              <object class="GtkImage">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="icon_name">view-refresh-symbolic</property>
-              </object>
-            </child>
-          </object>
-          <packing>
-            <property name="pack_type">end</property>
-            <property name="position">2</property>
-          </packing>
         </child>
         <child>
           <object class="GtkToggleButton" id="searchToggleButton">
@@ -88,6 +70,26 @@ Author: Gabriele Musco
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="icon_name">search-symbolic</property>
+              </object>
+            </child>
+          </object>
+          <packing>
+            <property name="pack_type">end</property>
+            <property name="position">2</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton" id="refreshButton">
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <property name="tooltip_text" translatable="yes">Refresh</property>
+            <signal name="clicked" handler="on_refreshButton_clicked" swapped="no"/>
+            <child>
+              <object class="GtkImage">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="icon_name">view-refresh-symbolic</property>
               </object>
             </child>
           </object>
@@ -127,6 +129,7 @@ Author: Gabriele Musco
                           <object class="GtkFlowBox" id="feedVideosFlowbox">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
+                            <property name="valign">start</property>
                             <property name="min_children_per_line">1</property>
                             <signal name="child-activated" handler="on_feedVideosFlowbox_child_activated" swapped="no"/>
                           </object>
@@ -158,7 +161,46 @@ Author: Gabriele Musco
                 <property name="can_focus">False</property>
                 <property name="orientation">vertical</property>
                 <child>
-                  <placeholder/>
+                  <object class="GtkScrolledWindow" id="channelsScrolledWindow">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="hscrollbar_policy">never</property>
+                    <property name="shadow_type">in</property>
+                    <child>
+                      <object class="GtkViewport" id="channelsViewport">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <child>
+                          <object class="GtkBox">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <child>
+                              <placeholder/>
+                            </child>
+                            <child type="center">
+                              <object class="GtkListBox" id="channelsListbox">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <style>
+                                  <class name="frame"/>
+                                </style>
+                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="fill">True</property>
+                                <property name="position">3</property>
+                              </packing>
+                            </child>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
                 </child>
                 <child>
                   <placeholder/>

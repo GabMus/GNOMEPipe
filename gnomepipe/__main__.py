@@ -26,6 +26,7 @@ from gi.repository import Gtk, Gdk, Gio, GdkPixbuf
 from . import threading_helper as ThreadingHelper
 from . import listbox_helper as ListboxHelper
 from . import videofeed_flowbox_item as VideofeedFlowboxItem
+from . import channel_listbox_item as ChannelListboxItem
 from . import pipe_channel
 
 
@@ -39,8 +40,6 @@ if 'XDG_RUNTIME_DIR' in os.environ.keys():
         G_CONFIG_FILE_PATH = '{0}/gnomepipe.json'.format(os.environ.get('XDG_CONFIG_HOME'))
         G_CACHE_PATH = '{0}/gnomepipe/'.format(os.environ.get('XDG_CACHE_HOME'))
 
-if not os.path.isdir(G_CONFIG_FILE_PATH):
-    os.makedirs(G_CONFIG_FILE_PATH)
 if not os.path.isdir(G_CACHE_PATH):
     os.makedirs(G_CACHE_PATH)
 
@@ -78,6 +77,8 @@ class Application(Gtk.Application):
         self.feed_videos_flowbox = self.builder.get_object('feedVideosFlowbox')
         self.spinner_or_content_stack = self.builder.get_object('spinnerOrContentStack')
         self.refresh_button = self.builder.get_object('refreshButton')
+
+        self.channels_listbox = self.builder.get_object('channelsListbox')
 
         self.errorDialog = Gtk.MessageDialog()
         self.errorDialog.add_button('Ok', 0)
@@ -167,7 +168,8 @@ class Application(Gtk.Application):
         self.window.show_all()
 
         # After components init, do the following
-        self.refresh_feed_ui()
+        self.refresh_feed_ui(True)
+        self.refresh_channels_ui(False)
 
     def do_command_line(self, args):
         """
@@ -208,7 +210,7 @@ class Application(Gtk.Application):
             subscriptions = self.configuration['subscriptions']
         for sub in subscriptions:
             if not sub in [c.channelid for c in self.channels]:
-                self.channels.append(pipe_channel.Channel.from_channelid(sub))
+                self.channels.append(pipe_channel.Channel.from_channelid(sub, G_CACHE_PATH))
         for index, channel in enumerate(self.channels):
             if not channel.channelid in subscriptions:
                 self.channels.pop(index)
@@ -229,15 +231,16 @@ class Application(Gtk.Application):
             else:
                 break
 
-    def refresh_feed_ui(self):
+    def refresh_feed_ui(self, reload=True):
         self.refresh_button.set_sensitive(False)
         self.spinner_set_state(True)
         self.empty_flowbox(self.feed_videos_flowbox)
-        refresh_thread = ThreadingHelper.do_async(
-            self.refresh_channels,
-            (self.configuration['subscriptions'],)
-        )
-        ThreadingHelper.wait_for_thread(refresh_thread)
+        if reload:
+            refresh_thread = ThreadingHelper.do_async(
+                self.refresh_channels,
+                (self.configuration['subscriptions'],)
+            )
+            ThreadingHelper.wait_for_thread(refresh_thread)
         self.spinner_set_state(False)
         # TODO: reimplement mixing all channels together with datetime ordering
         vffilist=[]
@@ -253,6 +256,28 @@ class Application(Gtk.Application):
             vffi.set_video_thumb()
         self.refresh_button.set_sensitive(True)
 
+    def refresh_channels_ui(self, reload=True):
+        self.refresh_button.set_sensitive(False)
+        self.spinner_set_state(True)
+        ListboxHelper.empty_listbox(self.channels_listbox)
+        if reload:
+            refresh_thread = ThreadingHelper.do_async(
+                self.refresh_channels,
+                (self.configuration['subscriptions'],)
+            )
+            ThreadingHelper.wait_for_thread(refresh_thread)
+        self.spinner_set_state(False)
+        clbilist=[]
+        for channel in self.channels:
+            clbi = ChannelListboxItem.ChannelBox(channel)
+            self.channels_listbox.add(clbi)
+            clbilist.append(clbi)
+            clbi.show_all()
+            self.channels_listbox.show_all()
+        for clbi in clbilist:
+            clbi.set_channel_picture()
+        self.refresh_button.set_sensitive(True)
+
     # Handler functions START
 
     def on_feedVideosFlowbox_child_activated(self, flowbox, child):
@@ -264,7 +289,8 @@ class Application(Gtk.Application):
         self.mpv_process = child.play_video()
 
     def on_refreshButton_clicked(self, btn):
-        self.refresh_feed_ui()
+        self.refresh_feed_ui(True)
+        self.refresh_channels_ui(False)
 
     def on_wallpapersFlowbox_child_activated(self, flowbox, selected_item):
         self.set_monitor_wallpaper_preview(
