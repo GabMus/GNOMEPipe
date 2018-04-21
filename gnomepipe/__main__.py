@@ -39,6 +39,11 @@ if 'XDG_RUNTIME_DIR' in os.environ.keys():
         G_CONFIG_FILE_PATH = '{0}/gnomepipe.json'.format(os.environ.get('XDG_CONFIG_HOME'))
         G_CACHE_PATH = '{0}/gnomepipe/'.format(os.environ.get('XDG_CACHE_HOME'))
 
+if not os.path.isdir(G_CONFIG_FILE_PATH):
+    os.makedirs(G_CONFIG_FILE_PATH)
+if not os.path.isdir(G_CACHE_PATH):
+    os.makedirs(G_CACHE_PATH)
+
 class Application(Gtk.Application):
     def __init__(self, **kwargs):
         self.builder = Gtk.Builder.new_from_resource(
