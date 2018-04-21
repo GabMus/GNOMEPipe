@@ -56,27 +56,8 @@ Author: Gabriele Musco
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="halign">center</property>
+            <property name="stack">mainStack</property>
           </object>
-        </child>
-        <child>
-          <object class="GtkButton" id="refreshButton">
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">True</property>
-            <property name="tooltip_text" translatable="yes">Refresh</property>
-            <signal name="clicked" handler="on_refreshButton_clicked" swapped="no"/>
-            <child>
-              <object class="GtkImage">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="icon_name">view-refresh-symbolic</property>
-              </object>
-            </child>
-          </object>
-          <packing>
-            <property name="pack_type">end</property>
-            <property name="position">2</property>
-          </packing>
         </child>
         <child>
           <object class="GtkToggleButton" id="searchToggleButton">
@@ -90,6 +71,26 @@ Author: Gabriele Musco
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="icon_name">search-symbolic</property>
+              </object>
+            </child>
+          </object>
+          <packing>
+            <property name="pack_type">end</property>
+            <property name="position">2</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton" id="refreshButton">
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <property name="tooltip_text" translatable="yes">Refresh</property>
+            <signal name="clicked" handler="on_refreshButton_clicked" swapped="no"/>
+            <child>
+              <object class="GtkImage">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="icon_name">view-refresh-symbolic</property>
               </object>
             </child>
           </object>
@@ -121,6 +122,7 @@ Author: Gabriele Musco
                     <property name="primary_icon_name">edit-find-symbolic</property>
                     <property name="primary_icon_activatable">False</property>
                     <property name="primary_icon_sensitive">False</property>
+                    <signal name="activate" handler="on_searchbarEntry_activate" swapped="no"/>
                   </object>
                 </child>
               </object>
@@ -186,7 +188,7 @@ Author: Gabriele Musco
                     <property name="can_focus">False</property>
                     <property name="orientation">vertical</property>
                     <child>
-                      <object class="GtkStack" id="ChannelsViewOrSearchStack">
+                      <object class="GtkStack" id="channelsViewOrSearchStack">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="transition_type">crossfade</property>
@@ -229,8 +231,8 @@ Author: Gabriele Musco
                             </child>
                           </object>
                           <packing>
-                            <property name="name">channels</property>
-                            <property name="title" translatable="yes">channels</property>
+                            <property name="name">view</property>
+                            <property name="title" translatable="yes">view</property>
                           </packing>
                         </child>
                         <child>
@@ -280,21 +282,21 @@ Author: Gabriele Musco
                                 </child>
                               </object>
                               <packing>
-                                <property name="expand">False</property>
+                                <property name="expand">True</property>
                                 <property name="fill">True</property>
                                 <property name="position">1</property>
                               </packing>
                             </child>
                           </object>
                           <packing>
-                            <property name="name">page0</property>
-                            <property name="title" translatable="yes">page0</property>
+                            <property name="name">search</property>
+                            <property name="title" translatable="yes">search</property>
                             <property name="position">1</property>
                           </packing>
                         </child>
                       </object>
                       <packing>
-                        <property name="expand">False</property>
+                        <property name="expand">True</property>
                         <property name="fill">True</property>
                         <property name="position">1</property>
                       </packing>

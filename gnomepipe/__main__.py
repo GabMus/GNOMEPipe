@@ -83,6 +83,11 @@ class Application(Gtk.Application):
         self.searchbar = self.builder.get_object('searchbar')
         self.searchbar_entry = self.builder.get_object('searchbarEntry')
 
+        self.channels_stack = self.builder.get_object('channelsViewOrSearchStack')
+        # self.feed_stack = self.builder.get_object('feedViewOrVideoSearchStack')
+
+        self.channels_search_listbox = self.builder.get_object('channelsSearchListbox')
+
         # Fixing searchbar: it has multiple box children (not explicit in the
         # xml but visible with gtk parasite), and one of them must be set to fill
         # otherwise the searchbar entry will be very small
@@ -289,6 +294,13 @@ class Application(Gtk.Application):
 
     def set_search_state(self, active):
         self.searchbar.set_search_mode(active)
+        self.channels_stack.set_visible_child_name(
+            'search' if active else 'view' # ternary operator THEN IF_CONDITION ELSE
+        )
+
+    def get_channel_search_results(self, keywords, return_list):
+        result_dict = pipe_channel.yam.search_channel(keywords)
+        return_list.append(result_dict)
 
     # Handler functions START
 
@@ -311,6 +323,33 @@ class Application(Gtk.Application):
 
     def on_searchToggleButton_toggled(self, button):
         self.set_search_state(button.get_active())
+
+    def on_searchbarEntry_activate(self, searchentry):
+        return_list = []
+        t = ThreadingHelper.do_async(
+            self.get_channel_search_results,
+            (searchentry.get_text(), return_list)
+        )
+        ThreadingHelper.wait_for_thread(t)
+        result_dict = return_list[0]
+        result_channels = []
+        clbilist = []
+        ListboxHelper.empty_listbox(self.channels_search_listbox)
+        for info in result_dict['items']:
+            result_pipe_channel = pipe_channel.Channel(
+                info['id']['channelId'],
+                info['snippet']['title'],
+                info['snippet']['thumbnails']['default']['url'],
+                info['snippet']['description'],
+                G_CACHE_PATH
+            )
+            result_channels.append(result_pipe_channel)
+            clbi = ChannelListboxItem.ChannelBox(result_pipe_channel)
+            self.channels_search_listbox.add(clbi)
+            clbilist.append(clbi)
+            clbi.show_all()
+        for clbi in clbilist:
+            clbi.set_channel_picture()
 
     # Handler functions END
 
