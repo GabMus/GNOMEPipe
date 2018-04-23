@@ -311,6 +311,19 @@ class Application(Gtk.Application):
         result_dict = pipe_channel.yam.search_video(keywords)
         return_list.append(result_dict)
 
+    def make_channel_from_id(self, channelid, return_list):
+        n_channel = pipe_channel.Channel.from_channelid(
+            channelid,
+            G_CACHE_PATH
+        )
+        return_list.append(n_channel)
+
+    def make_channel_from_constructor(self, channelid, name, picture, description, return_list):
+        n_channel = pipe_channel.Channel(
+            channelid, name, picture, description, G_CACHE_PATH
+        )
+        return_list.append(n_channel)
+
     def do_all_search(self, keywords):
         return_list_channel = []
         return_list_video = []
@@ -322,37 +335,20 @@ class Application(Gtk.Application):
             self.get_video_search_results,
             (keywords, return_list_video)
         )
-        ThreadingHelper.wait_for_thread(t_channel)
-        result_dict_channel = return_list_channel[0]
-        result_channels = []
-        clbilist = []
-        ListboxHelper.empty_listbox(self.channels_search_listbox)
-        for info in result_dict_channel['items']:
-            result_pipe_channel = pipe_channel.Channel(
-                info['id']['channelId'],
-                info['snippet']['title'],
-                info['snippet']['thumbnails']['default']['url'],
-                info['snippet']['description'],
-                G_CACHE_PATH
-            )
-            result_channels.append(result_pipe_channel)
-            clbi = ChannelListboxItem.ChannelBox(result_pipe_channel)
-            self.channels_search_listbox.add(clbi)
-            clbilist.append(clbi)
-            clbi.show_all()
-        for clbi in clbilist:
-            clbi.set_channel_picture()
         ThreadingHelper.wait_for_thread(t_video)
         result_dict_video = return_list_video[0]
         result_videos = []
         vffilist = []
         self.empty_flowbox(self.video_search_flowbox)
         for info in result_dict_video['items']:
+            n_channel_return_list = []
+            n_channel_t = ThreadingHelper.do_async(
+                self.make_channel_from_id,
+                (info['snippet']['channelId'], n_channel_return_list)
+            )
+            ThreadingHelper.wait_for_thread(n_channel_t)
             result_pipe_video = pipe_video.Video(
-                pipe_channel.Channel.from_channelid(
-                    info['snippet']['channelId'],
-                    G_CACHE_PATH
-                ),
+                n_channel_return_list[0],
                 info['snippet']['title'],
                 'https://www.youtube.com/watch?v={0}'.format(
                     info['id']['videoId']
@@ -369,8 +365,34 @@ class Application(Gtk.Application):
             self.video_search_flowbox.add(vffi)
             vffilist.append(vffi)
             vffi.show_all()
-        for vffi in vffilist:
             vffi.set_video_thumb()
+        # for vffi in vffilist:
+        #     vffi.set_video_thumb()
+        ThreadingHelper.wait_for_thread(t_channel)
+        result_dict_channel = return_list_channel[0]
+        result_channels = []
+        clbilist = []
+        ListboxHelper.empty_listbox(self.channels_search_listbox)
+        for info in result_dict_channel['items']:
+            n_channel_return_list = []
+            n_channel_t = ThreadingHelper.do_async(
+                self.make_channel_from_constructor,
+                (
+                    info['id']['channelId'],
+                    info['snippet']['title'],
+                    info['snippet']['thumbnails']['default']['url'],
+                    info['snippet']['description'],
+                    n_channel_return_list
+                )
+            )
+            ThreadingHelper.wait_for_thread(n_channel_t)
+            result_pipe_channel = n_channel_return_list[0]
+            result_channels.append(result_pipe_channel)
+            clbi = ChannelListboxItem.ChannelBox(result_pipe_channel)
+            self.channels_search_listbox.add(clbi)
+            clbilist.append(clbi)
+            clbi.show_all()
+            clbi.set_channel_picture()
 
     # Handler functions START
 

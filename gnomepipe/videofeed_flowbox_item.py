@@ -4,6 +4,7 @@ from gi.repository import Gtk, Gdk, Gio, GdkPixbuf
 from urllib import request
 from . import threading_helper as ThreadingHelper
 import os
+import html
 
 class VideofeedBox(Gtk.FlowBoxChild):
 
@@ -21,7 +22,7 @@ class VideofeedBox(Gtk.FlowBoxChild):
 
         self.titlelabel = Gtk.Label()
         self.titlelabel.set_use_markup(True)
-        self.titlelabel.set_label('<big>{0}</big>'.format(self.video.title))
+        self.titlelabel.set_label('<big>{0}</big>'.format(html.escape(self.video.title)))
         self.titlelabel.set_ellipsize(3) # 3 = ellipsize end
         self.titlelabel.set_halign(Gtk.Align.START)
         self.titlelabel.set_line_wrap(True)
