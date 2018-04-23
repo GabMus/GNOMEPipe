@@ -60,26 +60,6 @@ Author: Gabriele Musco
           </object>
         </child>
         <child>
-          <object class="GtkToggleButton" id="searchToggleButton">
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">True</property>
-            <property name="tooltip_text" translatable="yes">Search</property>
-            <signal name="toggled" handler="on_searchToggleButton_toggled" swapped="no"/>
-            <child>
-              <object class="GtkImage">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="icon_name">search-symbolic</property>
-              </object>
-            </child>
-          </object>
-          <packing>
-            <property name="pack_type">end</property>
-            <property name="position">2</property>
-          </packing>
-        </child>
-        <child>
           <object class="GtkButton" id="refreshButton">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
@@ -91,6 +71,26 @@ Author: Gabriele Musco
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="icon_name">view-refresh-symbolic</property>
+              </object>
+            </child>
+          </object>
+          <packing>
+            <property name="pack_type">end</property>
+            <property name="position">2</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkToggleButton" id="searchToggleButton">
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <property name="tooltip_text" translatable="yes">Search</property>
+            <signal name="toggled" handler="on_searchToggleButton_toggled" swapped="no"/>
+            <child>
+              <object class="GtkImage">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="icon_name">search-symbolic</property>
               </object>
             </child>
           </object>
@@ -143,35 +143,89 @@ Author: Gabriele Musco
                     <property name="can_focus">False</property>
                     <property name="orientation">vertical</property>
                     <child>
-                      <object class="GtkScrolledWindow" id="feedScrolledWindow">
+                      <placeholder/>
+                    </child>
+                    <child>
+                      <object class="GtkStack" id="feedViewOrSearchStack">
                         <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="hscrollbar_policy">never</property>
-                        <property name="shadow_type">in</property>
+                        <property name="can_focus">False</property>
+                        <property name="transition_type">crossfade</property>
                         <child>
-                          <object class="GtkViewport" id="feedViewport">
+                          <object class="GtkScrolledWindow" id="feedScrolledWindow">
                             <property name="visible">True</property>
-                            <property name="can_focus">False</property>
+                            <property name="can_focus">True</property>
+                            <property name="hscrollbar_policy">never</property>
+                            <property name="shadow_type">in</property>
                             <child>
-                              <object class="GtkFlowBox" id="feedVideosFlowbox">
+                              <object class="GtkViewport" id="feedViewport">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
-                                <property name="valign">start</property>
-                                <property name="min_children_per_line">1</property>
-                                <signal name="child-activated" handler="on_feedVideosFlowbox_child_activated" swapped="no"/>
+                                <child>
+                                  <object class="GtkFlowBox" id="feedVideosFlowbox">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="valign">start</property>
+                                    <property name="min_children_per_line">1</property>
+                                    <signal name="child-activated" handler="on_feedVideosFlowbox_child_activated" swapped="no"/>
+                                  </object>
+                                </child>
                               </object>
                             </child>
                           </object>
+                          <packing>
+                            <property name="name">view</property>
+                            <property name="title" translatable="yes">view</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkBox">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="orientation">vertical</property>
+                            <child>
+                              <object class="GtkScrolledWindow" id="videoSearchScrolledWindow">
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="hscrollbar_policy">never</property>
+                                <property name="shadow_type">in</property>
+                                <child>
+                                  <object class="GtkViewport" id="videoSearchViewport">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <child>
+                                      <object class="GtkFlowBox" id="videoSearchFlowbox">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="valign">start</property>
+                                        <property name="min_children_per_line">1</property>
+                                        <signal name="child-activated" handler="on_feedVideosFlowbox_child_activated" swapped="no"/>
+                                      </object>
+                                    </child>
+                                  </object>
+                                </child>
+                              </object>
+                              <packing>
+                                <property name="expand">True</property>
+                                <property name="fill">True</property>
+                                <property name="position">0</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <placeholder/>
+                            </child>
+                          </object>
+                          <packing>
+                            <property name="name">search</property>
+                            <property name="title" translatable="yes">search</property>
+                            <property name="position">1</property>
+                          </packing>
                         </child>
                       </object>
                       <packing>
                         <property name="expand">True</property>
                         <property name="fill">True</property>
-                        <property name="position">0</property>
+                        <property name="position">1</property>
                       </packing>
-                    </child>
-                    <child>
-                      <placeholder/>
                     </child>
                     <child>
                       <placeholder/>

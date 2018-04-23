@@ -28,6 +28,7 @@ from . import listbox_helper as ListboxHelper
 from . import videofeed_flowbox_item as VideofeedFlowboxItem
 from . import channel_listbox_item as ChannelListboxItem
 from . import pipe_channel
+from . import pipe_video
 
 
 HOME = os.environ.get('HOME')
@@ -84,9 +85,10 @@ class Application(Gtk.Application):
         self.searchbar_entry = self.builder.get_object('searchbarEntry')
 
         self.channels_stack = self.builder.get_object('channelsViewOrSearchStack')
-        # self.feed_stack = self.builder.get_object('feedViewOrVideoSearchStack')
+        self.feed_stack = self.builder.get_object('feedViewOrSearchStack')
 
         self.channels_search_listbox = self.builder.get_object('channelsSearchListbox')
+        self.video_search_flowbox = self.builder.get_object('videoSearchFlowbox')
 
         # Fixing searchbar: it has multiple box children (not explicit in the
         # xml but visible with gtk parasite), and one of them must be set to fill
@@ -297,10 +299,78 @@ class Application(Gtk.Application):
         self.channels_stack.set_visible_child_name(
             'search' if active else 'view' # ternary operator THEN IF_CONDITION ELSE
         )
+        self.feed_stack.set_visible_child_name(
+            'search' if active else 'view' # ternary operator THEN IF_CONDITION ELSE
+        )
 
     def get_channel_search_results(self, keywords, return_list):
         result_dict = pipe_channel.yam.search_channel(keywords)
         return_list.append(result_dict)
+
+    def get_video_search_results(self, keywords, return_list):
+        result_dict = pipe_channel.yam.search_video(keywords)
+        return_list.append(result_dict)
+
+    def do_all_search(self, keywords):
+        return_list_channel = []
+        return_list_video = []
+        t_channel = ThreadingHelper.do_async(
+            self.get_channel_search_results,
+            (keywords, return_list_channel)
+        )
+        t_video = ThreadingHelper.do_async(
+            self.get_video_search_results,
+            (keywords, return_list_video)
+        )
+        ThreadingHelper.wait_for_thread(t_channel)
+        result_dict_channel = return_list_channel[0]
+        result_channels = []
+        clbilist = []
+        ListboxHelper.empty_listbox(self.channels_search_listbox)
+        for info in result_dict_channel['items']:
+            result_pipe_channel = pipe_channel.Channel(
+                info['id']['channelId'],
+                info['snippet']['title'],
+                info['snippet']['thumbnails']['default']['url'],
+                info['snippet']['description'],
+                G_CACHE_PATH
+            )
+            result_channels.append(result_pipe_channel)
+            clbi = ChannelListboxItem.ChannelBox(result_pipe_channel)
+            self.channels_search_listbox.add(clbi)
+            clbilist.append(clbi)
+            clbi.show_all()
+        for clbi in clbilist:
+            clbi.set_channel_picture()
+        ThreadingHelper.wait_for_thread(t_video)
+        result_dict_video = return_list_video[0]
+        result_videos = []
+        vffilist = []
+        self.empty_flowbox(self.video_search_flowbox)
+        for info in result_dict_video['items']:
+            result_pipe_video = pipe_video.Video(
+                pipe_channel.Channel.from_channelid(
+                    info['snippet']['channelId'],
+                    G_CACHE_PATH
+                ),
+                info['snippet']['title'],
+                'https://www.youtube.com/watch?v={0}'.format(
+                    info['id']['videoId']
+                ),
+                'https://img.youtube.com/vi/{0}/mqdefault.jpg'.format(
+                    info['id']['videoId']
+                ),
+                info['snippet']['description'],
+                info['snippet']['publishedAt'],
+                G_CACHE_PATH
+            )
+            result_videos.append(result_pipe_video)
+            vffi = VideofeedFlowboxItem.VideofeedBox(result_pipe_video)
+            self.video_search_flowbox.add(vffi)
+            vffilist.append(vffi)
+            vffi.show_all()
+        for vffi in vffilist:
+            vffi.set_video_thumb()
 
     # Handler functions START
 
@@ -325,31 +395,7 @@ class Application(Gtk.Application):
         self.set_search_state(button.get_active())
 
     def on_searchbarEntry_activate(self, searchentry):
-        return_list = []
-        t = ThreadingHelper.do_async(
-            self.get_channel_search_results,
-            (searchentry.get_text(), return_list)
-        )
-        ThreadingHelper.wait_for_thread(t)
-        result_dict = return_list[0]
-        result_channels = []
-        clbilist = []
-        ListboxHelper.empty_listbox(self.channels_search_listbox)
-        for info in result_dict['items']:
-            result_pipe_channel = pipe_channel.Channel(
-                info['id']['channelId'],
-                info['snippet']['title'],
-                info['snippet']['thumbnails']['default']['url'],
-                info['snippet']['description'],
-                G_CACHE_PATH
-            )
-            result_channels.append(result_pipe_channel)
-            clbi = ChannelListboxItem.ChannelBox(result_pipe_channel)
-            self.channels_search_listbox.add(clbi)
-            clbilist.append(clbi)
-            clbi.show_all()
-        for clbi in clbilist:
-            clbi.set_channel_picture()
+        self.do_all_search(searchentry.get_text())
 
     # Handler functions END
 

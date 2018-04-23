@@ -21,6 +21,14 @@ def search_channel(keywords):
     )).read()
     return json.loads(res)
 
+def search_video(keywords):
+    res = request.urlopen('{0}search?key={1}&maxResults=25&q={2}&type=video&part=snippet'.format(
+        YT_API_PREFIX,
+        secret.YT_API_KEY,
+        parse.quote(keywords)
+    )).read()
+    return json.loads(res)
+
 def get_channel_info(channelid):
     res = request.urlopen('{0}channels?key={1}&id={2}&part=snippet'.format(
         YT_API_PREFIX,
