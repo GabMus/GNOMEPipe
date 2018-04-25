@@ -41,11 +41,14 @@ class ChannelBox(Gtk.ListBoxRow):
             (self.channel.picture, pixbuf_fake_list)
         )
         ThreadingHelper.wait_for_thread(pixbuf_thread)
-        self.channel_picture.set_from_pixbuf(pixbuf_fake_list[0])
-        self.channel_picture.show()
+        if len(pixbuf_fake_list):
+            self.channel_picture.set_from_pixbuf(pixbuf_fake_list[0])
+            self.channel_picture.show()
 
     def make_channel_picture_pixbuf(self, picurl, return_pixbuf_pointer=-1):
         # TODO: explore gdk_pixbuf_new_from_stream_async
+        if self.channel.picture is None:
+            return
         url = self.channel.picture
         extension = url[-4:]
         fullpath = self.channel.cachedir+self.channel.channelhash+extension

@@ -30,6 +30,8 @@ from . import channel_listbox_item as ChannelListboxItem
 from . import pipe_channel
 from . import pipe_video
 
+from urllib import request, parse
+
 
 HOME = os.environ.get('HOME')
 G_CONFIG_FILE_PATH = '{0}/.config/gnomepipe.json'.format(HOME)
@@ -83,6 +85,7 @@ class Application(Gtk.Application):
 
         self.searchbar = self.builder.get_object('searchbar')
         self.searchbar_entry = self.builder.get_object('searchbarEntry')
+        self.search_toggle_button = self.builder.get_object('searchToggleButton')
 
         self.channels_stack = self.builder.get_object('channelsViewOrSearchStack')
         self.feed_stack = self.builder.get_object('feedViewOrSearchStack')
@@ -112,6 +115,8 @@ class Application(Gtk.Application):
         self.detail_channel_picture = self.builder.get_object('videoDetailChannelPicture')
         self.detail_channel_name_label = self.builder.get_object('videoDetailChannelNameLabel')
         self.detail_thumb_button = self.builder.get_object('videoDetailThumbnailButton')
+
+        self.back_button = self.builder.get_object('backButton')
 
         self.errorDialog = Gtk.MessageDialog()
         self.errorDialog.add_button('Ok', 0)
@@ -319,6 +324,7 @@ class Application(Gtk.Application):
         self.feed_stack.set_visible_child_name(
             'search' if active else 'view' # ternary operator THEN IF_CONDITION ELSE
         )
+        self.search_toggle_button.set_active(active)
 
     def get_channel_search_results(self, keywords, return_list):
         result_dict = pipe_channel.yam.search_channel(keywords)
@@ -392,12 +398,20 @@ class Application(Gtk.Application):
         ListboxHelper.empty_listbox(self.channels_search_listbox)
         for info in result_dict_channel['items']:
             n_channel_return_list = []
+            channelid = None
+            channelpic = None
+            if 'id' in info.keys():
+                channelid = info['id']['channelId']
+            else:
+                channelid = info['snippet']['channelId']
+            if 'thumbnails' in info['snippet'].keys():
+                channelpic = info['snippet']['thumbnails']['default']['url']
             n_channel_t = ThreadingHelper.do_async(
                 self.make_channel_from_constructor,
                 (
-                    info['id']['channelId'],
+                    channelid,
                     info['snippet']['title'],
-                    info['snippet']['thumbnails']['default']['url'],
+                    channelpic,
                     info['snippet']['description'],
                     n_channel_return_list
                 )
@@ -434,6 +448,8 @@ class Application(Gtk.Application):
         return_list.append(picture_pixbuf)
 
     def open_video_detail(self, video):
+        self.back_button.set_sensitive(True)
+        self.set_search_state(False)
         self.detail_thumb_overlay.video = video
         self.detail_title_label.set_text(video.title)
         self.detail_channel_name_label.set_text(video.channel.name)
@@ -449,6 +465,10 @@ class Application(Gtk.Application):
         ThreadingHelper.wait_for_thread(t)
         self.detail_video_thumb.set_from_pixbuf(return_list[0])
         self.detail_channel_picture.set_from_pixbuf(return_list[1])
+
+    def close_video_detail(self):
+        self.back_button.set_sensitive(False)
+        self.feed_or_detail_stack.set_visible_child_name('feed')
 
     # Handler functions START
 
@@ -478,6 +498,9 @@ class Application(Gtk.Application):
                 return
         video.stop()
         self.mpv_process = video.play()
+
+    def on_backButton_clicked(self, button):
+        self.close_video_detail()
 
     # Handler functions END
 

@@ -46,11 +46,21 @@ Author: Gabriele Musco
         <property name="can_focus">False</property>
         <property name="show_close_button">True</property>
         <child>
-          <object class="GtkSpinner">
-            <property name="width_request">100</property>
+          <object class="GtkButton" id="backButton">
             <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="active">True</property>
+            <property name="sensitive">False</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <property name="tooltip_text" translatable="yes">Back
+</property>
+            <signal name="clicked" handler="on_backButton_clicked" swapped="no"/>
+            <child>
+              <object class="GtkImage">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="icon_name">go-previous-symbolic</property>
+              </object>
+            </child>
           </object>
         </child>
         <child>
@@ -211,6 +221,8 @@ Author: Gabriele Musco
                                               <object class="GtkEventBox" id="videoDetailEventBox">
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">False</property>
+                                                <property name="halign">center</property>
+                                                <property name="valign">end</property>
                                                 <signal name="button-press-event" handler="on_detail_video_thumb_press" swapped="no"/>
                                                 <child>
                                                   <object class="GtkOverlay" id="videoDetailThumbnailOverlay">
