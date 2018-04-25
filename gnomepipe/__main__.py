@@ -96,6 +96,19 @@ class Application(Gtk.Application):
         self.searchbar.get_child().get_child().get_children()[1].set_halign(Gtk.Align.FILL)
         self.searchbar_entry.set_hexpand(True)
 
+        self.feed_or_detail_stack = self.builder.get_object('videoFeedOrDetailStack')
+        self.builder.get_object('videoDetailThumbnailOverlay').add_overlay(
+            Gtk.Image.new_from_icon_name(
+                'media-playback-start',
+                Gtk.IconSize.DIALOG
+            )
+        )
+        self.detail_title_label = self.builder.get_object('videoDetailTitleLabel')
+        self.detail_video_thumb = self.builder.get_object('videoDetailThumbnail')
+        self.detail_description_label = self.builder.get_object('videoDetailDescriptionLabel')
+        self.detail_channel_picture = self.builder.get_object('videoDetailChannelPicture')
+        self.detail_channel_name_label = self.builder.get_object('videoDetailChannelNameLabel')
+
         self.errorDialog = Gtk.MessageDialog()
         self.errorDialog.add_button('Ok', 0)
         self.errorDialog.set_default_response(0)
@@ -394,9 +407,49 @@ class Application(Gtk.Application):
             clbi.show_all()
             clbi.set_channel_picture()
 
+    def make_thumb_and_channel_pixbufs(self, video, return_list):
+        video_url = video.thumbnail
+        video_extension = video_url[-4:]
+        video_fullpath = video.cachedir+video.videohash+video_extension
+        if not os.path.isfile(video_fullpath):
+            print('Downloading thumb of video {0}'.format(video.title))
+            request.urlretrieve(video_url, video_fullpath)
+        else:
+            print('Cache hit for thumb of video {0}'.format(video.title))
+        thumb_pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(video_fullpath, 250, 250, True)
+        chan_url = video.channel.picture
+        chan_extension = chan_url[-4:]
+        chan_fullpath = video.channel.cachedir+video.channel.channelhash+chan_extension
+        if not os.path.isfile(chan_fullpath):
+            print('Downloading picture of channel {0}'.format(video.channel.name))
+            request.urlretrieve(chan_url, chan_fullpath)
+        else:
+            print('Cache hit for picture of channel {0}'.format(video.channel.name))
+        picture_pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(chan_fullpath, 50, 50, True)
+        return_list.append(thumb_pixbuf)
+        return_list.append(picture_pixbuf)
+
+    def open_video_detail(self, video):
+        self.detail_title_label.set_text(video.title)
+        self.detail_channel_name_label.set_text(video.channel.name)
+        self.detail_description_label.set_text(
+            'Published {0}\n\n{1}'.format(video.datetime, video.description)
+        )
+        self.feed_or_detail_stack.set_visible_child_name('detail')
+        return_list = []
+        t = ThreadingHelper.do_async(
+            self.make_thumb_and_channel_pixbufs,
+            (video, return_list)
+        )
+        ThreadingHelper.wait_for_thread(t)
+        self.detail_video_thumb.set_from_pixbuf(return_list[0])
+        self.detail_channel_picture.set_from_pixbuf(return_list[1])
+
     # Handler functions START
 
     def on_feedVideosFlowbox_child_activated(self, flowbox, child):
+        self.open_video_detail(child.video)
+        return
         if not self.mpv_process is None:
             if self.mpv_process.poll() is None: # Process is still running
                 print('Another process is still running')

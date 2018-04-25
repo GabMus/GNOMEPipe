@@ -46,7 +46,12 @@ Author: Gabriele Musco
         <property name="can_focus">False</property>
         <property name="show_close_button">True</property>
         <child>
-          <placeholder/>
+          <object class="GtkSpinner">
+            <property name="width_request">100</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="active">True</property>
+          </object>
         </child>
         <child>
           <placeholder/>
@@ -151,25 +156,186 @@ Author: Gabriele Musco
                         <property name="can_focus">False</property>
                         <property name="transition_type">crossfade</property>
                         <child>
-                          <object class="GtkScrolledWindow" id="feedScrolledWindow">
+                          <object class="GtkStack" id="videoFeedOrDetailStack">
                             <property name="visible">True</property>
-                            <property name="can_focus">True</property>
-                            <property name="hscrollbar_policy">never</property>
-                            <property name="shadow_type">in</property>
+                            <property name="can_focus">False</property>
+                            <property name="transition_type">slide-left-right</property>
                             <child>
-                              <object class="GtkViewport" id="feedViewport">
+                              <object class="GtkScrolledWindow" id="feedScrolledWindow">
                                 <property name="visible">True</property>
-                                <property name="can_focus">False</property>
+                                <property name="can_focus">True</property>
+                                <property name="hscrollbar_policy">never</property>
+                                <property name="shadow_type">in</property>
                                 <child>
-                                  <object class="GtkFlowBox" id="feedVideosFlowbox">
+                                  <object class="GtkViewport" id="feedViewport">
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
-                                    <property name="valign">start</property>
-                                    <property name="min_children_per_line">1</property>
-                                    <signal name="child-activated" handler="on_feedVideosFlowbox_child_activated" swapped="no"/>
+                                    <child>
+                                      <object class="GtkFlowBox" id="feedVideosFlowbox">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="valign">start</property>
+                                        <property name="min_children_per_line">1</property>
+                                        <signal name="child-activated" handler="on_feedVideosFlowbox_child_activated" swapped="no"/>
+                                      </object>
+                                    </child>
                                   </object>
                                 </child>
                               </object>
+                              <packing>
+                                <property name="name">feed</property>
+                                <property name="title" translatable="yes">feed</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkBox" id="videoDetailMainBox">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="orientation">vertical</property>
+                                <child>
+                                  <object class="GtkScrolledWindow" id="videoDetailScrolledWindow">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="hscrollbar_policy">never</property>
+                                    <property name="shadow_type">in</property>
+                                    <child>
+                                      <object class="GtkViewport" id="videoDetailViewport">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <child>
+                                          <object class="GtkBox" id="videoDetailInnerBox">
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">False</property>
+                                            <property name="orientation">vertical</property>
+                                            <child>
+                                              <object class="GtkOverlay" id="videoDetailThumbnailOverlay">
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">False</property>
+                                                <child>
+                                                  <object class="GtkImage" id="videoDetailThumbnail">
+                                                    <property name="visible">True</property>
+                                                    <property name="can_focus">False</property>
+                                                    <property name="halign">center</property>
+                                                    <property name="valign">center</property>
+                                                    <property name="pixel_size">150</property>
+                                                    <property name="icon_name">video-x-generic</property>
+                                                  </object>
+                                                  <packing>
+                                                    <property name="index">-1</property>
+                                                  </packing>
+                                                </child>
+                                              </object>
+                                              <packing>
+                                                <property name="expand">False</property>
+                                                <property name="fill">True</property>
+                                                <property name="position">0</property>
+                                              </packing>
+                                            </child>
+                                            <child>
+                                              <object class="GtkLabel" id="videoDetailTitleLabel">
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">False</property>
+                                                <property name="halign">start</property>
+                                                <property name="valign">start</property>
+                                                <property name="margin_left">6</property>
+                                                <property name="margin_right">6</property>
+                                                <property name="margin_top">6</property>
+                                                <property name="margin_bottom">6</property>
+                                                <property name="label" translatable="yes">Video title</property>
+                                                <property name="wrap">True</property>
+                                                <property name="wrap_mode">word-char</property>
+                                                <attributes>
+                                                  <attribute name="weight" value="bold"/>
+                                                  <attribute name="scale" value="2"/>
+                                                </attributes>
+                                              </object>
+                                              <packing>
+                                                <property name="expand">False</property>
+                                                <property name="fill">True</property>
+                                                <property name="position">1</property>
+                                              </packing>
+                                            </child>
+                                            <child>
+                                              <object class="GtkBox">
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">False</property>
+                                                <child>
+                                                  <object class="GtkImage" id="videoDetailChannelPicture">
+                                                    <property name="visible">True</property>
+                                                    <property name="can_focus">False</property>
+                                                    <property name="pixel_size">50</property>
+                                                    <property name="icon_name">image-x-generic</property>
+                                                  </object>
+                                                  <packing>
+                                                    <property name="expand">False</property>
+                                                    <property name="fill">True</property>
+                                                    <property name="position">0</property>
+                                                  </packing>
+                                                </child>
+                                                <child>
+                                                  <object class="GtkLabel" id="videoDetailChannelNameLabel">
+                                                    <property name="visible">True</property>
+                                                    <property name="can_focus">False</property>
+                                                    <property name="margin_left">12</property>
+                                                    <property name="label" translatable="yes">Channel name</property>
+                                                    <property name="wrap">True</property>
+                                                    <property name="wrap_mode">word-char</property>
+                                                    <attributes>
+                                                      <attribute name="weight" value="semibold"/>
+                                                      <attribute name="underline" value="True"/>
+                                                    </attributes>
+                                                  </object>
+                                                  <packing>
+                                                    <property name="expand">False</property>
+                                                    <property name="fill">True</property>
+                                                    <property name="position">1</property>
+                                                  </packing>
+                                                </child>
+                                              </object>
+                                              <packing>
+                                                <property name="expand">False</property>
+                                                <property name="fill">True</property>
+                                                <property name="position">2</property>
+                                              </packing>
+                                            </child>
+                                            <child>
+                                              <object class="GtkLabel" id="videoDetailDescriptionLabel">
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">False</property>
+                                                <property name="halign">start</property>
+                                                <property name="valign">start</property>
+                                                <property name="margin_left">18</property>
+                                                <property name="margin_right">6</property>
+                                                <property name="margin_top">6</property>
+                                                <property name="margin_bottom">6</property>
+                                                <property name="label" translatable="yes">Video description</property>
+                                                <property name="wrap">True</property>
+                                                <property name="wrap_mode">word-char</property>
+                                                <property name="selectable">True</property>
+                                              </object>
+                                              <packing>
+                                                <property name="expand">False</property>
+                                                <property name="fill">True</property>
+                                                <property name="position">3</property>
+                                              </packing>
+                                            </child>
+                                          </object>
+                                        </child>
+                                      </object>
+                                    </child>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">True</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">0</property>
+                                  </packing>
+                                </child>
+                              </object>
+                              <packing>
+                                <property name="name">detail</property>
+                                <property name="title" translatable="yes">detail</property>
+                                <property name="position">1</property>
+                              </packing>
                             </child>
                           </object>
                           <packing>
@@ -178,7 +344,7 @@ Author: Gabriele Musco
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkBox">
+                          <object class="GtkBox" id="videoSearchSomethingBox">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="orientation">vertical</property>
