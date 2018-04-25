@@ -208,21 +208,27 @@ Author: Gabriele Musco
                                             <property name="can_focus">False</property>
                                             <property name="orientation">vertical</property>
                                             <child>
-                                              <object class="GtkOverlay" id="videoDetailThumbnailOverlay">
+                                              <object class="GtkEventBox" id="videoDetailEventBox">
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">False</property>
                                                 <child>
-                                                  <object class="GtkImage" id="videoDetailThumbnail">
+                                                  <object class="GtkOverlay" id="videoDetailThumbnailOverlay">
                                                     <property name="visible">True</property>
                                                     <property name="can_focus">False</property>
-                                                    <property name="halign">center</property>
-                                                    <property name="valign">center</property>
-                                                    <property name="pixel_size">150</property>
-                                                    <property name="icon_name">video-x-generic</property>
+                                                    <child>
+                                                      <object class="GtkImage" id="videoDetailThumbnail">
+                                                        <property name="visible">True</property>
+                                                        <property name="can_focus">False</property>
+                                                        <property name="halign">center</property>
+                                                        <property name="valign">center</property>
+                                                        <property name="pixel_size">250</property>
+                                                        <property name="icon_name">video-x-generic</property>
+                                                      </object>
+                                                      <packing>
+                                                        <property name="index">-1</property>
+                                                      </packing>
+                                                    </child>
                                                   </object>
-                                                  <packing>
-                                                    <property name="index">-1</property>
-                                                  </packing>
                                                 </child>
                                               </object>
                                               <packing>

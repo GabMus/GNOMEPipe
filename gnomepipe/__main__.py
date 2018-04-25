@@ -97,17 +97,21 @@ class Application(Gtk.Application):
         self.searchbar_entry.set_hexpand(True)
 
         self.feed_or_detail_stack = self.builder.get_object('videoFeedOrDetailStack')
-        self.builder.get_object('videoDetailThumbnailOverlay').add_overlay(
-            Gtk.Image.new_from_icon_name(
-                'media-playback-start',
-                Gtk.IconSize.DIALOG
-            )
+        self.detail_thumb_overlay = self.builder.get_object('videoDetailThumbnailOverlay')
+        self.play_icon = Gtk.Image.new_from_icon_name(
+            'media-playback-start',
+            Gtk.IconSize.DIALOG
+        )
+        self.detail_thumb_overlay.add_overlay(self.play_icon)
+        self.play_icon.connect(
+            'button-press-event', self.on_detail_video_thumb_press
         )
         self.detail_title_label = self.builder.get_object('videoDetailTitleLabel')
         self.detail_video_thumb = self.builder.get_object('videoDetailThumbnail')
         self.detail_description_label = self.builder.get_object('videoDetailDescriptionLabel')
         self.detail_channel_picture = self.builder.get_object('videoDetailChannelPicture')
         self.detail_channel_name_label = self.builder.get_object('videoDetailChannelNameLabel')
+        self.detail_thumb_button = self.builder.get_object('videoDetailThumbnailButton')
 
         self.errorDialog = Gtk.MessageDialog()
         self.errorDialog.add_button('Ok', 0)
@@ -430,6 +434,7 @@ class Application(Gtk.Application):
         return_list.append(picture_pixbuf)
 
     def open_video_detail(self, video):
+        self.detail_thumb_overlay.video = video
         self.detail_title_label.set_text(video.title)
         self.detail_channel_name_label.set_text(video.channel.name)
         self.detail_description_label.set_text(
@@ -449,13 +454,6 @@ class Application(Gtk.Application):
 
     def on_feedVideosFlowbox_child_activated(self, flowbox, child):
         self.open_video_detail(child.video)
-        return
-        if not self.mpv_process is None:
-            if self.mpv_process.poll() is None: # Process is still running
-                print('Another process is still running')
-                return
-        child.stop_video()
-        self.mpv_process = child.play_video()
 
     def on_refreshButton_clicked(self, btn):
         self.refresh_feed_ui(True)
@@ -471,6 +469,15 @@ class Application(Gtk.Application):
 
     def on_searchbarEntry_activate(self, searchentry):
         self.do_all_search(searchentry.get_text())
+
+    def on_detail_video_thumb_press(self, eventbox, eventbutton):
+        video = eventbox.get_child().video
+        if not self.mpv_process is None:
+            if self.mpv_process.poll() is None: # Process is still running
+                print('Another process is still running')
+                return
+        video.stop()
+        self.mpv_process = video.play()
 
     # Handler functions END
 
